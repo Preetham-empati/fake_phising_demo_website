@@ -26,7 +26,6 @@
             align-items: center;
         }
 
-        /* --- UI Elements --- */
         #simulation-container {
             width: 80%;
             max-width: 900px;
@@ -35,6 +34,7 @@
             padding: 2rem;
             box-shadow: 0 0 20px rgba(0, 255, 65, 0.2);
             position: relative;
+            z-index: 5;
         }
 
         .header-alert {
@@ -46,7 +46,7 @@
         }
 
         #terminal {
-            height: 300px;
+            height: 250px;
             background: rgba(0, 0, 0, 0.8);
             border: 1px solid #333;
             margin-top: 20px;
@@ -67,7 +67,6 @@
             text-shadow: 0 0 10px var(--alert-red);
         }
 
-        /* --- Glitch Effect --- */
         .glitch {
             position: relative;
             animation: glitch-anim 2s infinite linear alternate-reverse;
@@ -87,7 +86,6 @@
             100% { opacity: 1; }
         }
 
-        /* --- Controls & Disclaimers --- */
         .disclaimer {
             margin-top: 20px;
             font-size: 0.75rem;
@@ -103,15 +101,8 @@
             padding: 10px 20px;
             cursor: pointer;
             margin-top: 20px;
-            transition: all 0.3s;
         }
 
-        .btn-exit:hover {
-            background-color: var(--hacker-green);
-            color: black;
-        }
-
-        /* Scanline effect overlays */
         .scanlines {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -133,13 +124,11 @@
         
         <div class="timer-box" id="timer">00:60</div>
 
-        <div id="terminal">
-            </div>
+        <div id="terminal"></div>
 
         <div class="disclaimer">
             <strong>NOTICE:</strong> This is a cybersecurity awareness simulation.<br>
-            No real data is being accessed, collected, or transmitted.<br>
-            Its purpose is to demonstrate how social engineering and technical pressure look.
+            No real data is being accessed. Purpose: Demonstration of phishing/hacking pressure tactics.
         </div>
 
         <button class="btn-exit" onclick="endSimulation()">EXIT SIMULATION</button>
@@ -150,86 +139,65 @@
         const timerDisplay = document.getElementById('timer');
         let timeLeft = 60;
 
-        // 1. Fake Log Messages for demonstration
         const logMessages = [
             "[SIMULATION] Initializing port scan...",
-            "[SIMULATION] Vulnerability detected: CVE-2024-FAKE",
+            "[SIMULATION] Vulnerability detected: CVE-2026-FAKE",
             "[SIMULATION] Attempting credential harvest...",
-            "[SIMULATION] Fake payload injected into memory...",
-            "[SIMULATION] Scanning local network for targets...",
-            "[SIMULATION] Bypassing firewall (Mock-up)...",
-            "[SIMULATION] Establishing remote connection...",
-            "[SIMULATION] Data exfiltration started (Test data only)...",
-            "[SIMULATION] WARNING: Unauthorized admin access simulation...",
-            "[SIMULATION] Encrypting mock file system..."
+            "[SIMULATION] Injecting mock payload...",
+            "[SIMULATION] Bypassing virtual firewall...",
+            "[SIMULATION] Data exfiltration simulation started..."
         ];
 
-        // 2. Function to add logs to the terminal
         function addLog() {
+            if(!terminal) return;
             const entry = document.createElement('div');
             entry.className = 'log-entry';
             const randomMsg = logMessages[Math.floor(Math.random() * logMessages.length)];
             entry.innerHTML = `<span class="log-fake">${new Date().toLocaleTimeString()}</span> ${randomMsg}`;
             terminal.appendChild(entry);
-            
-            // Auto-scroll to bottom
             terminal.scrollTop = terminal.scrollHeight;
-
-            // Keep logs clean
-            if (terminal.childNodes.length > 12) {
-                terminal.removeChild(terminal.firstChild);
-            }
+            if (terminal.childNodes.length > 10) terminal.removeChild(terminal.firstChild);
         }
 
-        // 3. Countdown Timer Logic
         const countdown = setInterval(() => {
             timeLeft--;
-            let seconds = timeLeft < 10 ? '0' + timeLeft : timeLeft;
-            timerDisplay.innerText = `00:${seconds}`;
-
-            if (timeLeft <= 0) {
+            timerDisplay.innerText = `00:${timeLeft < 10 ? '0' + timeLeft : timeLeft}`;
+            if (timeLeft <= 45) { // Trigger the "Block" early for the demo
                 clearInterval(countdown);
-                timerDisplay.innerText = "SYSTEM REBOOT";
-                alert("Simulation Complete. In a real scenario, this urgency is used to make you panic and click malicious links.");
-                endSimulation();
+                triggerBrowserBlock();
             }
         }, 1000);
 
-        // 4. Run log animation
         setInterval(addLog, 1500);
 
-        // 5. Exit logic
-        function endSimulation() {
-            if (document.fullscreenElement) {
-                document.exitFullscreen();
-            }
-            // In a real demo, you might redirect to an educational landing page
+        function triggerBrowserBlock() {
+            // This replaces the entire screen with the "Malicious Site" warning
             document.body.innerHTML = `
-                <div style="text-align:center; padding: 50px;">
-                    <h1>Simulation Ended Safely</h1>
-                    <p>Remember: Real threats often use urgency and scary visuals to trick you.</p>
-                    <button onclick="location.reload()" style="padding:10px; cursor:pointer;">Restart Demo</button>
+                <div style="background-color: #d32f2f; color: white; height: 100vh; font-family: sans-serif; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 40px; text-align: left; width:100vw;">
+                    <div style="max-width: 600px;">
+                        <span style="font-size: 80px; font-weight: bold;">!</span>
+                        <h1 style="font-size: 35px; margin-top: 10px;">Deceptive site ahead</h1>
+                        <p style="font-size: 18px; line-height: 1.5;">Attackers on <strong>simulation-demo.local</strong> may trick you into doing something dangerous like installing software or revealing your personal information.</p>
+                        
+                        <div style="margin-top: 30px;">
+                            <button onclick="location.reload()" style="background: white; border: none; color: #d32f2f; padding: 12px 24px; cursor: pointer; border-radius: 4px; font-weight: bold;">Back to safety</button>
+                        </div>
+                        
+                        <p style="margin-top: 80px; font-size: 14px; opacity: 0.7; border-top: 1px solid rgba(255,255,255,0.3); padding-top: 20px;">
+                            <strong>TRAINING NOTE:</strong> Browsers use services like Google Safe Browsing to block known malicious URLs. This screen is a simulation of that protection.
+                        </p>
+                    </div>
                 </div>
             `;
         }
 
-        // Optional: Trigger Fullscreen on first click to enhance immersion
-        document.addEventListener('click', () => {
-            if (!document.fullscreenElement) {
-                document.documentElement.requestFullscreen().catch(e => console.log("Fullscreen blocked"));
-            }
-        }, { once: true });
-        function showFakeBlock() {
-            document.body.innerHTML = `
-                <div style="background:#d32f2f; color:white; height:100vh; display:flex; flex-direction:column; justify-content:center; align-items:center; font-family:sans-serif; padding:20px; text-align:center;">
-                    <h1 style="font-size:5rem;">Dangerous Site?</h1>
-                    <p style="font-size:1.5rem;">Attackers on the site you were trying to visit might trick you into doing something dangerous.</p>
-                    <button onclick="location.reload()" style="background:white; color:#d32f2f; border:none; padding:15px 30px; font-weight:bold; cursor:pointer; margin-top:20px;">Back to Safety</button>
-                    <p style="margin-top:50px; opacity:0.8;">(This is a training simulation. In a real scenario, your browser protects you like this.)</p>
-        </div>
-    `;
-}
+        function endSimulation() {
+            document.body.innerHTML = `<div style="color:white; text-align:center; margin-top:100px;"><h1>Demo Ended.</h1><button onclick="location.reload()">Restart</button></div>`;
+        }
 
+        document.addEventListener('click', () => {
+            if (!document.fullscreenElement) document.documentElement.requestFullscreen().catch(() => {});
+        }, { once: true });
     </script>
 </body>
 </html>
