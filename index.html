@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cybersecurity Awareness Simulation</title>
+    <style>
+        :root {
+            --hacker-green: #00FF41;
+            --alert-red: #FF0000;
+            --bg-black: #0a0a0a;
+        }
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--bg-black);
+            color: var(--hacker-green);
+            font-family: 'Courier New', Courier, monospace;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* --- UI Elements --- */
+        #simulation-container {
+            width: 80%;
+            max-width: 900px;
+            text-align: center;
+            border: 1px solid var(--hacker-green);
+            padding: 2rem;
+            box-shadow: 0 0 20px rgba(0, 255, 65, 0.2);
+            position: relative;
+        }
+
+        .header-alert {
+            color: var(--alert-red);
+            font-size: 2rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            animation: blink 0.8s infinite;
+        }
+
+        #terminal {
+            height: 300px;
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid #333;
+            margin-top: 20px;
+            padding: 15px;
+            text-align: left;
+            overflow-y: hidden;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+
+        .log-entry { margin-bottom: 5px; }
+        .log-fake { color: #888; font-style: italic; }
+
+        .timer-box {
+            font-size: 3rem;
+            color: var(--alert-red);
+            margin: 20px 0;
+            text-shadow: 0 0 10px var(--alert-red);
+        }
+
+        /* --- Glitch Effect --- */
+        .glitch {
+            position: relative;
+            animation: glitch-anim 2s infinite linear alternate-reverse;
+        }
+
+        @keyframes glitch-anim {
+            0% { transform: translate(0); }
+            20% { transform: translate(-2px, 2px); }
+            40% { transform: translate(-2px, -2px); text-shadow: 2px 0 red; }
+            60% { transform: translate(2px, 2px); text-shadow: -2px 0 blue; }
+            100% { transform: translate(0); }
+        }
+
+        @keyframes blink {
+            0% { opacity: 1; }
+            50% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+
+        /* --- Controls & Disclaimers --- */
+        .disclaimer {
+            margin-top: 20px;
+            font-size: 0.75rem;
+            color: #666;
+            border-top: 1px solid #333;
+            padding-top: 10px;
+        }
+
+        .btn-exit {
+            background-color: transparent;
+            color: var(--hacker-green);
+            border: 1px solid var(--hacker-green);
+            padding: 10px 20px;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: all 0.3s;
+        }
+
+        .btn-exit:hover {
+            background-color: var(--hacker-green);
+            color: black;
+        }
+
+        /* Scanline effect overlays */
+        .scanlines {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), 
+                        linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            background-size: 100% 2px, 3px 100%;
+            pointer-events: none;
+            z-index: 10;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="scanlines"></div>
+
+    <div id="simulation-container">
+        <div class="header-alert glitch">⚠ SECURITY ALERT ⚠</div>
+        <p>SYSTEM BREACH SIMULATION IN PROGRESS</p>
+        
+        <div class="timer-box" id="timer">00:60</div>
+
+        <div id="terminal">
+            </div>
+
+        <div class="disclaimer">
+            <strong>NOTICE:</strong> This is a cybersecurity awareness simulation.<br>
+            No real data is being accessed, collected, or transmitted.<br>
+            Its purpose is to demonstrate how social engineering and technical pressure look.
+        </div>
+
+        <button class="btn-exit" onclick="endSimulation()">EXIT SIMULATION</button>
+    </div>
+
+    <script>
+        const terminal = document.getElementById('terminal');
+        const timerDisplay = document.getElementById('timer');
+        let timeLeft = 60;
+
+        // 1. Fake Log Messages for demonstration
+        const logMessages = [
+            "[SIMULATION] Initializing port scan...",
+            "[SIMULATION] Vulnerability detected: CVE-2024-FAKE",
+            "[SIMULATION] Attempting credential harvest...",
+            "[SIMULATION] Fake payload injected into memory...",
+            "[SIMULATION] Scanning local network for targets...",
+            "[SIMULATION] Bypassing firewall (Mock-up)...",
+            "[SIMULATION] Establishing remote connection...",
+            "[SIMULATION] Data exfiltration started (Test data only)...",
+            "[SIMULATION] WARNING: Unauthorized admin access simulation...",
+            "[SIMULATION] Encrypting mock file system..."
+        ];
+
+        // 2. Function to add logs to the terminal
+        function addLog() {
+            const entry = document.createElement('div');
+            entry.className = 'log-entry';
+            const randomMsg = logMessages[Math.floor(Math.random() * logMessages.length)];
+            entry.innerHTML = `<span class="log-fake">${new Date().toLocaleTimeString()}</span> ${randomMsg}`;
+            terminal.appendChild(entry);
+            
+            // Auto-scroll to bottom
+            terminal.scrollTop = terminal.scrollHeight;
+
+            // Keep logs clean
+            if (terminal.childNodes.length > 12) {
+                terminal.removeChild(terminal.firstChild);
+            }
+        }
+
+        // 3. Countdown Timer Logic
+        const countdown = setInterval(() => {
+            timeLeft--;
+            let seconds = timeLeft < 10 ? '0' + timeLeft : timeLeft;
+            timerDisplay.innerText = `00:${seconds}`;
+
+            if (timeLeft <= 0) {
+                clearInterval(countdown);
+                timerDisplay.innerText = "SYSTEM REBOOT";
+                alert("Simulation Complete. In a real scenario, this urgency is used to make you panic and click malicious links.");
+                endSimulation();
+            }
+        }, 1000);
+
+        // 4. Run log animation
+        setInterval(addLog, 1500);
+
+        // 5. Exit logic
+        function endSimulation() {
+            if (document.fullscreenElement) {
+                document.exitFullscreen();
+            }
+            // In a real demo, you might redirect to an educational landing page
+            document.body.innerHTML = `
+                <div style="text-align:center; padding: 50px;">
+                    <h1>Simulation Ended Safely</h1>
+                    <p>Remember: Real threats often use urgency and scary visuals to trick you.</p>
+                    <button onclick="location.reload()" style="padding:10px; cursor:pointer;">Restart Demo</button>
+                </div>
+            `;
+        }
+
+        // Optional: Trigger Fullscreen on first click to enhance immersion
+        document.addEventListener('click', () => {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(e => console.log("Fullscreen blocked"));
+            }
+        }, { once: true });
+        function showFakeBlock() {
+            document.body.innerHTML = `
+                <div style="background:#d32f2f; color:white; height:100vh; display:flex; flex-direction:column; justify-content:center; align-items:center; font-family:sans-serif; padding:20px; text-align:center;">
+                    <h1 style="font-size:5rem;">Dangerous Site?</h1>
+                    <p style="font-size:1.5rem;">Attackers on the site you were trying to visit might trick you into doing something dangerous.</p>
+                    <button onclick="location.reload()" style="background:white; color:#d32f2f; border:none; padding:15px 30px; font-weight:bold; cursor:pointer; margin-top:20px;">Back to Safety</button>
+                    <p style="margin-top:50px; opacity:0.8;">(This is a training simulation. In a real scenario, your browser protects you like this.)</p>
+        </div>
+    `;
+}
+
+    </script>
+</body>
+</html>
